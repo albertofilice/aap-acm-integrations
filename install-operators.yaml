@@ -1,0 +1,78 @@
+---
+- name: Get InstallPlan for Deleting {{ cluster_name }}
+  kubernetes.core.k8s_info:
+    api_version: operators.coreos.com/v1alpha1
+    kind: InstallPlan
+    namespace: "{{ namespace }}"
+    host: "{{ hub_url }}/{{ cluster_name }}"
+    api_key: "{{ clusters_tokens | selectattr('cluster_name', '==', cluster_name) | map(attribute='token') | first }}"
+    validate_certs: false      
+  register: installplan_to_delete
+
+## Delete Old InstallPlan
+
+- name: Delete the oldest InstallPlans {{ cluster_name }}
+  kubernetes.core.k8s:
+    definition:
+      apiVersion: operators.coreos.com/v1alpha1
+      kind: InstallPlan
+      metadata:
+        name: "{{ item.metadata.name }}"
+        namespace: "{{ namespace }}"
+    state: absent
+    host: "{{ hub_url }}/{{ cluster_name }}"
+    api_key: "{{ clusters_tokens | selectattr('cluster_name', '==', cluster_name) | map(attribute='token') | first }}"
+    validate_certs: false        
+  with_items: "{{ installplan_to_delete.resources }}"
+  when: installplan_to_delete is defined and installplan_to_delete | length > 0 and item.spec.approved == false
+
+## End Delete Old InstallPlan
+
+- name: Get InstallPlan for update {{ cluster_name }}
+  kubernetes.core.k8s_info:
+    api_version: operators.coreos.com/v1alpha1
+    kind: InstallPlan
+    namespace: "{{ namespace }}"
+    host: "{{ hub_url }}/{{ cluster_name }}"
+    api_key: "{{ clusters_tokens | selectattr('cluster_name', '==', cluster_name) | map(attribute='token') | first }}"
+    validate_certs: false      
+  register: installplan_info
+  until: installplan_info is not failed
+  retries: 10
+  delay: 15    
+
+- name: Setup InstallPlan Array {{ cluster_name }}
+  set_fact:
+    unapproved_installplans: []
+
+- name: Filter with approved False {{ cluster_name }}
+  set_fact:
+    unapproved_installplans: "{{ unapproved_installplans + [item.metadata.name] }}"
+  with_items: "{{ installplan_info.resources }}"
+  when: installplan_info is defined and installplan_info | length > 0 and item.spec.approved == false
+
+- name: Print unapproved_installplans {{ cluster_name }}
+  debug:
+    msg: "{{ item }}" 
+  with_items: "{{ unapproved_installplans }}"  
+  when: unapproved_installplans is defined and unapproved_installplans | length > 0
+
+- name: Approve the InstallPlan {{ cluster_name }}
+  kubernetes.core.k8s:
+    merge_type:
+      - strategic-merge
+      - merge
+    definition: |
+      apiVersion: operators.coreos.com/v1alpha1
+      kind: InstallPlan
+      metadata:
+        name: "{{ item }}"
+        namespace: "openshift-operators"
+      spec:
+        approved: true
+    state: present
+    host: "{{ hub_url }}/{{ cluster_name }}"
+    api_key: "{{ clusters_tokens | selectattr('cluster_name', '==', cluster_name) | map(attribute='token') | first }}"
+    validate_certs: false
+  with_items: "{{ unapproved_installplans }}"
+  when: unapproved_installplans is defined and unapproved_installplans | length > 0

@@ -1,0 +1,33 @@
+---
+- name: Get jobs completed in "Failed" status {{ cluster_name }}
+  kubernetes.core.k8s_info:
+    api_version: batch/v1
+    kind: Job
+    namespace: "{{ namespace }}"
+    host: "{{ hub_url }}/{{ cluster_name }}"
+    api_key: "{{ clusters_tokens | selectattr('cluster_name', '==', cluster_name) | map(attribute='token') | first }}"
+    validate_certs: false      
+  register: failed_jobs
+
+- name: debug jobs Failed {{ cluster_name }}
+  debug:
+    msg: "{{ item.metadata.name }}"
+  with_items: "{{ failed_jobs.resources }}"
+  when: item.status.conditions | selectattr('type', 'equalto', 'Failed') | selectattr('status', 'equalto', 'True')
+
+- name: Deletes completed jobs in "Failed" status {{ cluster_name }}
+  kubernetes.core.k8s:
+    state: absent
+    namespace: "{{ item.metadata.namespace }}"
+    definition:
+      apiVersion: batch/v1
+      kind: Job
+      metadata:
+        name: "{{ item.metadata.name }}"
+        namespace: "{{ namespace }}"
+    wait: yes
+    host: "{{ hub_url }}/{{ cluster_name }}"
+    api_key: "{{ clusters_tokens | selectattr('cluster_name', '==', cluster_name) | map(attribute='token') | first }}"
+    validate_certs: false
+  with_items: "{{ failed_jobs.resources }}"
+  when: item.status.conditions | selectattr('type', 'equalto', 'Failed') | selectattr('status', 'equalto', 'True')

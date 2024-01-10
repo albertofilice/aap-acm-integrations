@@ -1,0 +1,24 @@
+---
+apiVersion: policy.open-cluster-management.io/v1beta1
+kind: PolicyAutomation
+metadata:
+  name: policy-install-amq-automation
+spec:
+  automationDef:
+    name: <Template Name>
+    secret: <Credentials Secret Name>
+    type: AnsibleJob
+  mode: disabled
+  policyRef: install-amq
+---  
+apiVersion: policy.open-cluster-management.io/v1beta1
+kind: PolicyAutomation
+metadata:
+  name: policy-check-job-failed-automation
+spec:
+  automationDef:
+    name: <Template Name>
+    secret: <Credentials Secret Name>
+    type: AnsibleJob
+  mode: disabled
+  policyRef: check-job-failed

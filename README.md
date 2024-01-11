@@ -31,139 +31,147 @@ The Ansible Automation Platform can also be external to the RHACM-related HUB cl
 
     1.1 Installing from the OpenShift Container Platform Console 
 
-        Select Operators -> OperatorHub to access the list of available operators and select Advanced Cluster Management for Kubernetes operator.
+     Select Operators -> OperatorHub to access the list of available operators and select Advanced Cluster Management for Kubernetes operator.
 
-        On the Operator subscription page, select the options for your installation:
-
-        Namespace information:
-
-        The Red Hat Advanced Cluster Management hub cluster must be installed in its own namespace or project.
-        By default, the OperatorHub console installation process creates a namespace titled open-cluster-management. Best practice: Continue to use the open-cluster-management namespace if it is available.
-        If there is already a namespace named open-cluster-management, choose a different namespace.
-        Channel: The channel that you select corresponds to the release that you are installing. 
-        Approval strategy for updates: The approval strategy identifies the human interaction required for applying updates to the channel or release to which you subscribed.
-
-        Select "Automatic" to ensure all the updates within that release are automatically installed.
-        Select "Manual" to receive a notification when an update is available. If you want to have the control of all the installed updates this might be best practice for you.
-        
-        Select "Install" to apply your changes and create the operator.
-        Create the MultiClusterHub custom resource.
-
-        In the OpenShift Container Platform console navigation select "Installed Operators" > Advanced Cluster Management for Kubernetes.
-        Select the "MultiClusterHub" tab.
-        Select "Create MultiClusterHub".
-        Update the default values in the YAML file. See options in the MultiClusterHub advanced configuration section of the documentation.
-
-        The following example shows the default template. Confirm that namespace is your project namespace. See the sample:
-
-        ```yaml
-        apiVersion: operator.open-cluster-management.io/v1
-        kind: MultiClusterHub
-        metadata:
-        name: multiclusterhub
-        namespace: <namespace>
-        ```
-
-        Select "Create" to initialize the custom resource. It can take up to 10 minutes for the Red Hat Advanced Cluster Management hub cluster to build and start.
+     On the Operator subscription page, select the options for your installation:
+     
+     Namespace information:
+     
+     The Red Hat Advanced Cluster Management hub cluster must be installed in its own namespace or project.
+     By default, the OperatorHub console installation process creates a namespace titled open-cluster-management. Best practice: Continue to use the open-cluster-management namespace if it is available.
+     If there is already a namespace named open-cluster-management, choose a different namespace.
+     
+     Channel: The channel that you select corresponds to the release that you are installing. 
+     
+     Approval strategy for updates: The approval strategy identifies the human interaction required for applying updates to the channel or release to which you subscribed.
+     Select "Automatic" to ensure all the updates within that release are automatically installed.
+     Select "Manual" to receive a notification when an update is available. If you want to have the control of all the installed updates this might be best practice for you.
+     
+     Select "Install" to apply your changes and create the operator.
+     
+     Create the MultiClusterHub custom resource.
+     
+     In the OpenShift Container Platform console navigation select "Installed Operators" > Advanced Cluster Management for Kubernetes.
+     
+     Select the "MultiClusterHub" tab.
+     
+     Select "Create MultiClusterHub".
+     
+     Update the default values in the YAML file. See options in the MultiClusterHub advanced configuration section of the documentation.
+     
+     The following example shows the default template. Confirm that namespace is your project namespace. See the sample:
+     ```yaml
+     apiVersion: operator.open-cluster-management.io/v1
+     kind: MultiClusterHub
+     metadata:
+     name: multiclusterhub
+     namespace: <namespace>
+     ```
+     Select "Create" to initialize the custom resource. It can take up to 10 minutes for the Red Hat Advanced Cluster Management hub cluster to build and start.
 
     1.2 Installing from the OpenShift Container Platform CLI
         
-        For convenience, all installation files are located in the bootstrap folder.
+      For convenience, all installation files are located in the bootstrap folder.
 
-        - Create Namespace
-            ```yaml
-            apiVersion: v1
-            kind: Namespace
-            metadata:
-            name: open-cluster-management        
-            ```
-        - Create Subscription and OperatorGroup
-            ```yaml
-            apiVersion: operators.coreos.com/v1
-            kind: OperatorGroup
-            metadata:
-            name: open-cluster-management
-            namespace: open-cluster-management
-            spec:
-            targetNamespaces:
+      - Create Namespace
+      
+          ```yaml
+          apiVersion: v1
+          kind: Namespace
+          metadata:
+          name: open-cluster-management        
+          ```
+            
+      - Create Subscription and OperatorGroup
+          ```yaml
+          apiVersion: operators.coreos.com/v1
+          kind: OperatorGroup
+          metadata:
+          name: open-cluster-management
+          namespace: open-cluster-management
+          spec:
+          targetNamespaces:
             - open-cluster-management  
-            ---
-            apiVersion: operators.coreos.com/v1alpha1
-            kind: Subscription
-            metadata:
-            name: advanced-cluster-management
-            namespace: open-cluster-management
-            spec:
-            channel: release-2.8
-            installPlanApproval: Automatic
-            name: advanced-cluster-management
-            source: redhat-operators
-            sourceNamespace: openshift-marketplace      
-            ```     
-        - Create MultiClusterHub
-            ```yaml
-            apiVersion: operator.open-cluster-management.io/v1
-            kind: MultiClusterHub
-            metadata:
-            name: multiclusterhub
-            namespace: open-cluster-management
-            spec: {}         
-            ```              
+          ---
+          apiVersion: operators.coreos.com/v1alpha1
+          kind: Subscription
+          metadata:
+          name: advanced-cluster-management
+          namespace: open-cluster-management
+          spec:
+          channel: release-2.8
+          installPlanApproval: Automatic
+          name: advanced-cluster-management
+          source: redhat-operators
+          sourceNamespace: openshift-marketplace      
+          ```     
+      - Create MultiClusterHub
+          ```yaml
+          apiVersion: operator.open-cluster-management.io/v1
+          kind: MultiClusterHub
+          metadata:
+          name: multiclusterhub
+          namespace: open-cluster-management
+          spec: {}         
+          ```              
 
 2. Ansible Automation Platform Operator installation
 
 Ensure that Ansible Automation Platform is correctly installed and configured. Check that the playbooks required for integration are present and functioning.
 
-    2.1 Installing from the OpenShift Container Platform Console 
+  2.1 Installing from the OpenShift Container Platform Console
 
-        - Select "Operators" -> OperatorHub to access the list of available operators and select Ansible Automation Platform operator and click "Install".
+  - Select "Operators" -> OperatorHub to access the list of available operators and select Ansible Automation Platform operator and click "Install"
 
-        - Select an Update Channel:
+  - Select an Update Channel:
 
-            **stable-2.x**: installs a namespace-scoped operator, which limits deployments of automation hub and automation controller instances to the namespace the operator is installed in. This is suitable for most cases. The stable-2.x channel does not require administrator privileges and utilizes fewer resources because it only monitors a single namespace.
+  **stable-2.x**: installs a namespace-scoped operator, which limits deployments of automation hub and automation controller instances to the namespace the operator is installed in. This is suitable for most cases. The stable-2.x channel does not require administrator privileges and utilizes fewer resources because it only monitors a single namespace.
 
-            **stable-2.x-cluster-scoped**: deploys automation hub and automation controller across multiple namespaces in the cluster and requires administrator privileges for all namespaces in the cluster.
+  **stable-2.x-cluster-scoped**: deploys automation hub and automation controller across multiple namespaces in the cluster and requires administrator privileges for all namespaces in the cluster.
 
-        - Select "Installation Mode", "Installed Namespace" and "Approval Strategy".
+  - Select "Installation Mode", "Installed Namespace" and "Approval Strategy".
         
-        - Click "Install".
+  - Click "Install".
 
-    1.2 Installing from the OpenShift Container Platform CLI
+  1.2 Installing from the OpenShift Container Platform CLI
         
-        For convenience, all installation files are located in the bootstrap folder.
+  For convenience, all installation files are located in the bootstrap folder.
 
-        - Create Namespace
-            ```yaml
-            apiVersion: v1
-            kind: Namespace
-            metadata:
-            annotations: {}
-            name: aap
-            spec: {}      
-            ```
-        - Create Subscription and OperatorGroup
-            ```yaml
-            apiVersion: operators.coreos.com/v1
-            kind: OperatorGroup
-            metadata:
-            name: ansible-automation-platform
-            namespace: aap
-            spec:
-            targetNamespaces:
-                - aap 
-            ---
-            apiVersion: operators.coreos.com/v1alpha1
-            kind: Subscription
-            metadata:
-            name: ansible-automation-platform-operator
-            namespace: ansible-automation-platform
-            spec:
-            channel: stable-2.4
-            installPlanApproval: Automatic
-            name: ansible-automation-platform-operator
-            source: redhat-operators
-            sourceNamespace: openshift-marketplace    
-            ```     
+  - Create Namespace
+
+  ```yaml
+  apiVersion: v1
+  kind: Namespace
+  metadata:
+  annotations: {}
+  name: aap
+  spec: {}      
+  ```
+
+  - Create Subscription and OperatorGroup
+
+  ```yaml
+  apiVersion: operators.coreos.com/v1
+  kind: OperatorGroup
+  metadata:
+  name: ansible-automation-platform
+  namespace: aap
+  spec:
+  targetNamespaces:
+      - aap 
+  ---
+  apiVersion: operators.coreos.com/v1alpha1
+  kind: Subscription
+  metadata:
+  name: ansible-automation-platform-operator
+  namespace: ansible-automation-platform
+  spec:
+  channel: stable-2.4
+  installPlanApproval: Automatic
+  name: ansible-automation-platform-operator
+  source: redhat-operators
+  sourceNamespace: openshift-marketplace    
+  ```     
 
 If you have not installed Ansible Automation Controller yet, you can follow the relevant [documentation](https://access.redhat.com/documentation/en-us/red_hat_ansible_automation_platform/2.1/html/red_hat_ansible_automation_platform_operator_installation_guide/installing-controller-operator) to create an AAP Controller Instance.
 

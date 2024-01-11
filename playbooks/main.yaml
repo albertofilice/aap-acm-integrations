@@ -130,7 +130,7 @@
 ####### Include Your task #######
 
         - name: Delete Failed Jobs in Openshift-Logging
-          include_tasks: "delete-failed-jobs.yaml"
+          include_tasks: "tasks/delete-failed-jobs.yaml"
           vars:
             cluster_name: "{{ cluster_item }}"
             namespace: "openshift-logging"
@@ -140,7 +140,7 @@
           when: policy_name is defined and "check-job-failed" in policy_name  
 
         - name: Install AMQ Streams
-          include_tasks: "install-operators.yaml"
+          include_tasks: "tasks/install-operators.yaml"
           vars:
             cluster_name: "{{ cluster_item }}"
             namespace: "openshift-operators"

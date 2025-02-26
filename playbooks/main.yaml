@@ -39,7 +39,7 @@
               - strategic-merge
               - merge
             definition: |
-              apiVersion: authentication.open-cluster-management.io/v1alpha1
+              apiVersion: authentication.open-cluster-management.io/v1beta1
               kind: ManagedServiceAccount
               metadata:
                 name: aap-integration-serviceaccount
@@ -66,10 +66,10 @@
                 name: aap-integration-serviceaccount
                 namespace: "{{ item }}"
                 ownerReferences:
-                - apiVersion: authentication.open-cluster-management.io/v1alpha1
+                - apiVersion: authentication.open-cluster-management.io/v1beta1
                   kind: ManagedServiceAccount
                   name: aap-integration-serviceaccount
-                  uid: "{{ query('kubernetes.core.k8s', api_key=token_acm, host=hub_url, validate_certs=false, api_version='authentication.open-cluster-management.io/v1alpha1', kind='ManagedServiceAccount', namespace=item, resource_name='aap-integration-serviceaccount') | community.general.json_query('[0].metadata.uid') }}"
+                  uid: "{{ query('kubernetes.core.k8s', api_key=token_acm, host=hub_url, validate_certs=false, api_version='authentication.open-cluster-management.io/v1beta1', kind='ManagedServiceAccount', namespace=item, resource_name='aap-integration-serviceaccount') | community.general.json_query('[0].metadata.uid') }}"
                   blockOwnerDeletion: true
                   controller: true
               spec:
@@ -148,7 +148,7 @@
           kubernetes.core.k8s:
             state: absent
             definition: |
-              apiVersion: authentication.open-cluster-management.io/v1alpha1
+              apiVersion: authentication.open-cluster-management.io/v1beta1
               kind: ManagedServiceAccount
               metadata:
                 name: aap-integration-serviceaccount
@@ -173,10 +173,10 @@
                 name: aap-integration-serviceaccount
                 namespace: "{{ item }}"
                 ownerReferences:
-                - apiVersion: authentication.open-cluster-management.io/v1alpha1
+                - apiVersion: authentication.open-cluster-management.io/v1beta1
                   kind: ManagedServiceAccount
                   name: aap-integration-serviceaccount
-                  uid: "{{ query('kubernetes.core.k8s', api_key=token_acm, host=hub_url, validate_certs=false, api_version='authentication.open-cluster-management.io/v1alpha1', kind='ManagedServiceAccount', namespace=item, resource_name='aap-integration-serviceaccount') | community.general.json_query('[0].metadata.uid') }}"
+                  uid: "{{ query('kubernetes.core.k8s', api_key=token_acm, host=hub_url, validate_certs=false, api_version='authentication.open-cluster-management.io/v1beta1', kind='ManagedServiceAccount', namespace=item, resource_name='aap-integration-serviceaccount') | community.general.json_query('[0].metadata.uid') }}"
                   blockOwnerDeletion: true
                   controller: true
               spec:

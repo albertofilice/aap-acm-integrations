@@ -8,17 +8,9 @@
     hub_url: ""
 
   tasks:
-    - name: Set up login credentials
-      k8s_auth:
-        validate_certs: false
-        api_key: "{{ token_acm }}"
-        host: "{{ hub_url }}/local-cluster"
-      register: k8s_auth_results
-      no_log: true      
-
     - name: Login into cluster
       shell: |
-        oc login --token {{ k8s_auth_results.openshift_auth.api_key }} {{ k8s_auth_results.openshift_auth.host }} --insecure-skip-tls-verify
+        oc login --token {{ token_acm }} {{ hub_url }}/local-cluster --insecure-skip-tls-verify
       no_log: true
 
     - block:

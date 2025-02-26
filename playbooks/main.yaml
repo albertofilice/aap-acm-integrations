@@ -135,6 +135,9 @@
           register: secret_result
           with_items: "{{ target_clusters }}"
 
+        - debug:
+            var: secret_result.results
+
         - name: Extract and decode token
           set_fact:
             clusters_tokens: "{{ clusters_tokens + [clusters] }}"

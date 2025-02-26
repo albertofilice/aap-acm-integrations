@@ -63,6 +63,7 @@
             validate_certs: false
             host: "{{ hub_url }}/local-cluster"
             api_key: "{{ token_acm }}"
+          with_items: "{{ target_clusters }}"            
           register: msa_info
 
         - name: Create ManifestWork

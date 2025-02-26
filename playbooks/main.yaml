@@ -124,13 +124,13 @@
 
 
         - name: Fetch secret aap-integration-serviceaccount
-          k8s_info:
+          kubernetes.core.k8s_info:
             api_version: v1
             kind: Secret
             namespace: "{{ item }}"
             name: "aap-integration-serviceaccount"
             api_key: "{{ token_acm }}"
-            host: "{{ hub_url }}"
+            host: "{{ hub_url }}/local-cluster"
             validate_certs: false
           register: secret_result
           with_items: "{{ target_clusters }}"

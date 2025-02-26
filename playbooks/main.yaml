@@ -144,7 +144,7 @@
           vars:
             clusters:
               cluster_name: "{{ item }}"
-              token: "{{ (secret_result.results[0].resources[0].data.token | b64decode  }}"
+              token: "{{ secret_result.results[0].resources[0].data.token | b64decode  }}"
           with_items: "{{ target_clusters }}"
 
 ####### Include Your task #######

@@ -54,6 +54,17 @@
           with_items: "{{ target_clusters }}"
           register: msa_creation_result
 
+        - name: Get UID of ManagedServiceAccount
+          kubernetes.core.k8s_info:
+            api_version: authentication.open-cluster-management.io/v1beta1
+            kind: ManagedServiceAccount
+            namespace: "{{ item }}"
+            name: aap-integration-serviceaccount
+            validate_certs: false
+            host: "{{ hub_url }}/local-cluster"
+            api_key: "{{ token_acm }}"
+          register: msa_info
+
         - name: Create ManifestWork
           kubernetes.core.k8s:
             merge_type:
@@ -69,7 +80,7 @@
                 - apiVersion: authentication.open-cluster-management.io/v1beta1
                   kind: ManagedServiceAccount
                   name: aap-integration-serviceaccount
-                  uid: "{{ query('kubernetes.core.k8s', api_key=token_acm, host=hub_url, validate_certs=false, api_version='authentication.open-cluster-management.io/v1beta1', kind='ManagedServiceAccount', namespace=item, resource_name='aap-integration-serviceaccount') | community.general.json_query('[0].metadata.uid') }}"
+                  uid: "{{ msa_info.resources[0].metadata.uid }}"
                   blockOwnerDeletion: true
                   controller: true
               spec:
@@ -176,7 +187,7 @@
                 - apiVersion: authentication.open-cluster-management.io/v1beta1
                   kind: ManagedServiceAccount
                   name: aap-integration-serviceaccount
-                  uid: "{{ query('kubernetes.core.k8s', api_key=token_acm, host=hub_url, validate_certs=false, api_version='authentication.open-cluster-management.io/v1beta1', kind='ManagedServiceAccount', namespace=item, resource_name='aap-integration-serviceaccount') | community.general.json_query('[0].metadata.uid') }}"
+                  uid: "{{ msa_info.resources[0].metadata.uid }}"
                   blockOwnerDeletion: true
                   controller: true
               spec:

@@ -66,6 +66,10 @@
           with_items: "{{ target_clusters }}"            
           register: msa_info
 
+        - name: Ensure msa_info is correctly retrieved
+          debug:
+            var: msa_info
+
         - name: Create ManifestWork
           kubernetes.core.k8s:
             merge_type:

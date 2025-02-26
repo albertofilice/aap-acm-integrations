@@ -122,13 +122,26 @@
           set_fact:
             clusters_tokens: []
 
-        - name: Fetch a list of namespaces and store tokens in a dictionary
+
+        - name: Fetch secret aap-integration-serviceaccount
+          k8s_info:
+            api_version: v1
+            kind: Secret
+            namespace: "{{ item }}"
+            name: "aap-integration-serviceaccount"
+            api_key: "{{ token_acm }}"
+            host: "{{ hub_url }}"
+            validate_certs: false
+          register: secret_result
+          with_items: "{{ target_clusters }}"
+
+        - name: Extract and decode token
           set_fact:
-            clusters_tokens: "{{ clusters_tokens +  [ clusters ] }}" 
+            clusters_tokens: "{{ clusters_tokens + [clusters] }}"
           vars:
             clusters:
               cluster_name: "{{ item }}"
-              token: "{{ query('kubernetes.core.k8s', api_key=token_acm, host=hub_url, validate_certs=false, api_version='v1', kind='Secret', namespace=item, resource_name='aap-integration-serviceaccount') | community.general.json_query('[0].data.token') | b64decode }}"         
+              token: "{{ (secret_result.results | selectattr('item', 'equalto', item) | map(attribute='resources') | first | default({})).data.token | default('') | b64decode }}"
           with_items: "{{ target_clusters }}"
 
 ####### Include Your task #######
@@ -188,7 +201,7 @@
                 - apiVersion: authentication.open-cluster-management.io/v1beta1
                   kind: ManagedServiceAccount
                   name: aap-integration-serviceaccount
-                  uid: "{{ msa_info.resources[0].metadata.uid }}"
+                  uid: "{{ msa_info.results[0].resources[0].metadata.uid }}"
                   blockOwnerDeletion: true
                   controller: true
               spec:

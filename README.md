@@ -175,7 +175,7 @@ Ensure that Ansible Automation Platform is correctly installed and configured. C
 
 If you have not installed Ansible Automation Controller yet, you can follow the relevant [documentation](https://access.redhat.com/documentation/en-us/red_hat_ansible_automation_platform/2.1/html/red_hat_ansible_automation_platform_operator_installation_guide/installing-controller-operator) to create an AAP Controller Instance.
 
-3. Abilitating ManagedServiceAccount
+3. Enabling ManagedServiceAccount
 
 RHACM allows the dynamic creation of ServiceAccounts on ManagedClusters. Make sure that this functionality is enabled on managed clusters.
 
@@ -192,7 +192,7 @@ spec:
       enabled: true
 ```
 
-3. Configurating Cluster Proxy
+3. Configuring Cluster Proxy
 
 RHACM uses Cluster Proxy to allow secure access to AAP-managed clusters. Configure Cluster Proxy to generate AAP-accessible URLs. For example:
 
